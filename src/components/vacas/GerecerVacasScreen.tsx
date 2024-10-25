@@ -56,7 +56,8 @@ const ListVacasScreen = () => {
       setDataUltimaCria('');
       setLote('');
       setModalVisible(false);
-      fetchVacas(); 
+      fetchVacas();
+      Alert.alert("Sucesso", "Vaca registrada com sucesso!"); 
     } catch (error) {
       console.error("Erro ao cadastrar vaca: ", error);
     }
@@ -78,6 +79,7 @@ const ListVacasScreen = () => {
         setSelectedVaca(null);
         setModalVisible(false);
         fetchVacas(); 
+        Alert.alert("Sucesso", "Vaca editada com sucesso!"); 
       } catch (error) {
         console.error("Erro ao editar vaca: ", error);
       }
@@ -94,6 +96,7 @@ const ListVacasScreen = () => {
           try {
             await deleteDoc(doc(db, "Vacas", id));
             fetchVacas(); 
+            Alert.alert("Sucesso", "Vaca deletada com sucesso!");
           } catch (error) {
             console.error("Erro ao excluir vaca: ", error);
           }
