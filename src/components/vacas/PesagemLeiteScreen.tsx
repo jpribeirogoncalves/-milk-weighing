@@ -93,7 +93,6 @@ const PesagemLeiteScreen = () => {
   };
 
   const handleViewPesagens = async (vacaId) => {
-    setLoading(true);
     try {
       const pesagensCollection = collection(db, "Pesagens");
       const pesagensQuery = query(pesagensCollection, where("vacaId", "==", vacaId));
@@ -179,14 +178,14 @@ const PesagemLeiteScreen = () => {
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
             <Text style={styles.modalTitle}>Pesagens da Vaca</Text>
-            <Text style={styles.modalSubTitle}>Vaca: {selectedVaca?.nome}</Text>
+            {/* <Text style={styles.modalSubTitle}>Vaca: {selectedVaca?.nome}</Text> */}
             <FlatList
               data={pesagens}
               keyExtractor={item => item.id}
               renderItem={({ item }) => (
                 <View style={styles.pesagemItemContainer}>
                   <Text style={styles.pesagemItem}>
-                    {item.pesoLeite} kg - Data: {item.data.toDate().toLocaleDateString()}
+                    {item.pesoLeite} kg - Data: {item.data.toDate().toLocaleDateString('pt-br')}
                   </Text>
                   <TouchableOpacity
                     style={styles.editButton}
@@ -214,7 +213,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 16,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: '#f0f0f0',
   },
   loadingIndicator: {
     flex: 1,
@@ -301,13 +300,12 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   cancelButton: {
-    marginTop: 15,
+    marginTop: 10,
     alignItems: 'center',
   },
   cancelButtonText: {
-    color: '#333',
-    fontSize: 14,
-    textDecorationLine: 'underline',
+    color: '#f44336',
+    fontWeight: 'bold',
   },
   buttonContainer: {
     flexDirection: 'row',

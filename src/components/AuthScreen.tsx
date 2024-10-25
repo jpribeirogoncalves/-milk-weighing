@@ -1,14 +1,15 @@
 // src/components/AuthScreen.tsx
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Text, TextInput, Pressable, StyleSheet } from 'react-native';
-import Icon from 'react-native-vector-icons/FontAwesome'; // ou o ícone de sua escolha
+import { Ionicons } from '@expo/vector-icons'; // Importando Ionicons
 
 const AuthScreen = ({ email, setEmail, password, setPassword, isLogin, setIsLogin, handleAuthentication }) => {
+  const [showPassword, setShowPassword] = useState(false);
   return (
     <View style={styles.container}>
       <View style={styles.authContainer}>
         <View style={styles.iconContainer}>
-          <Icon name="balance-scale" size={50} color="#3498db" />
+          <Ionicons name="scale-outline" size={50} color="#3498db" />
         </View>
         <Text style={styles.title}>{isLogin ? 'Login' : 'Cadastrar'}</Text>
 
@@ -16,16 +17,21 @@ const AuthScreen = ({ email, setEmail, password, setPassword, isLogin, setIsLogi
           style={styles.input}
           value={email}
           onChangeText={setEmail}
-          placeholder="Email"
+          placeholder="E-mail"
           autoCapitalize="none"
         />
-        <TextInput
-          style={styles.input}
-          value={password}
-          onChangeText={setPassword}
-          placeholder="Senha"
-          secureTextEntry
-        />
+        <View style={styles.passwordContainer}>
+          <TextInput
+            style={styles.input_senha}
+            value={password}
+            onChangeText={setPassword}
+            placeholder="Senha"
+            secureTextEntry={!showPassword}
+          />
+          <Pressable onPress={() => setShowPassword(!showPassword)} style={styles.eyeIcon}>
+            <Ionicons name={showPassword ? 'eye-off' : 'eye'} size={24} color="#888" />
+          </Pressable>
+        </View>
         <View style={styles.buttonContainer}>
           <Pressable style={styles.button} onPress={handleAuthentication}>
             <Text style={styles.buttonText}>{isLogin ? 'Entrar' : 'Cadastrar'}</Text>
@@ -84,6 +90,14 @@ const styles = StyleSheet.create({
     padding: 10,
     borderRadius: 6,
   },
+  input_senha: {
+    flex: 1,
+    height: 45,
+    borderColor: '#ddd',
+    borderWidth: 1,
+    padding: 10,
+    borderRadius: 6,
+  },
   buttonContainer: {
     marginBottom: 16,
   },
@@ -104,6 +118,16 @@ const styles = StyleSheet.create({
   },
   bottomContainer: {
     marginTop: 20,
+  },
+  passwordContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  eyeIcon: {
+    padding: 8,
+    position: 'absolute',
+    right: 10,
   },
 });
 
