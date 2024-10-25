@@ -1,13 +1,16 @@
 // src/screens/MainScreen.tsx
 import React, { useState } from 'react';
-import { ScrollView, StyleSheet } from 'react-native';
+import { createStackNavigator } from '@react-navigation/stack';
 import { useAuth } from '../hooks/useAuth';
 import AuthScreen from '../components/AuthScreen';
 import AuthenticatedScreen from '../components/AuthenticatedScreen';
+import GerencerVacasScreen from '../components/vacas/GerecerVacasScreen';
+import EditAccountScreen from '../components/EditAccountScreen';
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from '@firebase/auth';
 import app from '../firebase';
 
 const auth = getAuth(app);
+const Stack = createStackNavigator();
 
 const MainScreen = () => {
   const [email, setEmail] = useState('');
@@ -39,25 +42,40 @@ const MainScreen = () => {
   };
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
+    <Stack.Navigator>
       {user ? (
-        <AuthenticatedScreen user={user} handleAuthentication={handleAuthentication} />
+        <Stack.Screen name="Pagina Inicial" options={{ headerShown: false }}>
+          {(props) => (
+            <AuthenticatedScreen 
+              {...props}
+              user={user}
+              handleAuthentication={handleAuthentication}
+            />
+          )}
+        </Stack.Screen>
       ) : (
-        <AuthScreen
-          email={email}
-          setEmail={setEmail}
-          password={password}
-          setPassword={setPassword}
-          isLogin={isLogin}
-          setIsLogin={setIsLogin}
-          handleAuthentication={handleAuthentication}
-        />
+        <Stack.Screen name="Login/Cadastrar" options={{ headerShown: false }}>
+          {(props) => (
+            <AuthScreen
+              {...props}
+              email={email}
+              setEmail={setEmail}
+              password={password}
+              setPassword={setPassword}
+              isLogin={isLogin}
+              setIsLogin={setIsLogin}
+              handleAuthentication={handleAuthentication}
+            />
+          )}
+        </Stack.Screen>
       )}
-    </ScrollView>
+      <Stack.Screen name="Gerenciar vacas" component={GerencerVacasScreen} />
+      <Stack.Screen name="Editar dados da conta" component={EditAccountScreen} />
+    </Stack.Navigator>
   );
 };
 
-const styles = StyleSheet.create({
+const styles = {
   container: {
     flexGrow: 1,
     justifyContent: 'center',
@@ -65,6 +83,6 @@ const styles = StyleSheet.create({
     padding: 16,
     backgroundColor: '#f0f0f0',
   },
-});
+};
 
 export default MainScreen;

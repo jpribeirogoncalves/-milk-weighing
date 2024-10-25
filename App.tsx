@@ -1,6 +1,7 @@
+// src/App.tsx
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
-import MainScreen from '../milk-weighing/src/pages/MainScreen';
+import MainScreen from './src/pages/MainScreen';
 
 const App = () => {
   return (
