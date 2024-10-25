@@ -158,34 +158,36 @@ const ListVacasScreen = () => {
         onRequestClose={() => setModalVisible(false)}
       >
         <View style={styles.modalContainer}>
-          <Text style={styles.modalTitle}>{isEditing ? "Editar Vaca" : "Adicionar Vaca"}</Text>
-          <TextInput
-            placeholder="Nome"
-            value={nome}
-            onChangeText={setNome}
-            style={styles.input}
-          />
-          <TextInput
-            placeholder="Data da Última Cria"
-            value={dataUltimaCria}
-            onChangeText={setDataUltimaCria}
-            style={styles.input}
-          />
-          <TextInput
-            placeholder="Lote"
-            value={lote}
-            onChangeText={setLote}
-            style={styles.input}
-          />
-          <TouchableOpacity
-            style={styles.submitButton}
-            onPress={isEditing ? handleEditVaca : handleAddVaca}
-          >
-            <Text style={styles.submitButtonText}>{isEditing ? "Atualizar" : "Adicionar"}</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.cancelButton} onPress={() => setModalVisible(false)}>
-            <Text style={styles.cancelButtonText}>Cancelar</Text>
-          </TouchableOpacity>
+            <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>{isEditing ? "Editar Vaca" : "Adicionar Vaca"}</Text>
+            <TextInput
+              placeholder="Nome"
+              value={nome}
+              onChangeText={setNome}
+              style={styles.input}
+            />
+            <TextInput
+              placeholder="Data da Última Cria"
+              value={dataUltimaCria}
+              onChangeText={setDataUltimaCria}
+              style={styles.input}
+            />
+            <TextInput
+              placeholder="Lote"
+              value={lote}
+              onChangeText={setLote}
+              style={styles.input}
+            />
+            <TouchableOpacity
+              style={styles.submitButton}
+              onPress={isEditing ? handleEditVaca : handleAddVaca}
+            >
+              <Text style={styles.submitButtonText}>{isEditing ? "Atualizar" : "Adicionar"}</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.cancelButton} onPress={() => setModalVisible(false)}>
+              <Text style={styles.cancelButtonText}>Cancelar</Text>
+            </TouchableOpacity>
+          </View>
         </View>
       </Modal>
     </View>
@@ -255,36 +257,62 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.9)',
+    backgroundColor: 'rgba(0, 0, 0, 0.6)',
+    padding: 20,
+  },
+  modalContent: {
+    width: '90%',
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    padding: 20,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 8,
+    elevation: 5,
   },
   modalTitle: {
-    fontSize: 24,
+    fontSize: 22,
+    marginBottom: 15,
+    fontWeight: '600',
+    color: '#333',
+  },
+  modalSubTitle: {
+    fontSize: 16,
     marginBottom: 20,
-    color: '#fff',
+    color: '#666',
   },
   input: {
-    width: '80%',
-    padding: 10,
-    backgroundColor: '#fff',
-    borderRadius: 5,
+    width: '100%',
+    padding: 12,
+    backgroundColor: '#f0f0f0',
+    borderRadius: 8,
+    borderColor: '#ddd',
+    borderWidth: 1,
     marginBottom: 15,
   },
   submitButton: {
     backgroundColor: '#4CAF50',
-    padding: 10,
-    borderRadius: 5,
-    width: '80%',
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    borderRadius: 8,
+    width: '100%',
     alignItems: 'center',
+    marginTop: 10,
   },
   submitButtonText: {
     color: '#fff',
-    fontWeight: 'bold',
+    fontWeight: '600',
+    fontSize: 16,
   },
   cancelButton: {
-    marginTop: 10,
+    marginTop: 15,
+    alignItems: 'center',
   },
   cancelButtonText: {
-    color: '#fff',
+    color: '#333',
+    fontSize: 14,
     textDecorationLine: 'underline',
   },
   addButton: {

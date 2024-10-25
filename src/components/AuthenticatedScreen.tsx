@@ -23,6 +23,11 @@ const AuthenticatedScreen: React.FC<AuthenticatedScreenProps> = ({ user, handleA
           <Text style={styles.buttonText}>Gerenciar vacas</Text>
         </Pressable>
 
+        
+        <Pressable style={styles.button} onPress={() => navigation.navigate("Pesagem do leite")}>
+          <Text style={styles.buttonText}>Pesagem do leite</Text>
+        </Pressable>
+
         <Pressable style={styles.button} onPress={() => navigation.navigate("Editar dados da conta", { user })}>
           <Ionicons name="create-outline" size={20} color="#fff" style={styles.icon} />
           <Text style={styles.buttonText}>Editar Dados da Conta</Text>
