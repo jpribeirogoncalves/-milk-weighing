@@ -301,13 +301,12 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   cancelButton: {
-    marginTop: 15,
+    marginTop: 10,
     alignItems: 'center',
   },
   cancelButtonText: {
-    color: '#333',
-    fontSize: 14,
-    textDecorationLine: 'underline',
+    color: '#f44336',
+    fontWeight: 'bold',
   },
   buttonContainer: {
     flexDirection: 'row',

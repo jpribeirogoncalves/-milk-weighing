@@ -1,14 +1,14 @@
 // src/components/AuthScreen.tsx
 import React from 'react';
 import { View, Text, TextInput, Pressable, StyleSheet } from 'react-native';
-import Icon from 'react-native-vector-icons/FontAwesome'; // ou o ícone de sua escolha
+import { Ionicons } from '@expo/vector-icons'; // Importando Ionicons
 
 const AuthScreen = ({ email, setEmail, password, setPassword, isLogin, setIsLogin, handleAuthentication }) => {
   return (
     <View style={styles.container}>
       <View style={styles.authContainer}>
         <View style={styles.iconContainer}>
-          <Icon name="balance-scale" size={50} color="#3498db" />
+          <Ionicons name="scale-outline" size={50} color="#3498db" />
         </View>
         <Text style={styles.title}>{isLogin ? 'Login' : 'Cadastrar'}</Text>
 

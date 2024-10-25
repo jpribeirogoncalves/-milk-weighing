@@ -1,104 +1,107 @@
 import { useEffect, useState } from 'react';
 import { View, Text, FlatList, ActivityIndicator, StyleSheet, Modal, TextInput, TouchableOpacity, Alert } from 'react-native';
 import { getAuth } from "firebase/auth"; 
-import { getFirestore, collection, getDocs, query, where, addDoc, deleteDoc, doc, updateDoc } from "firebase/firestore"; 
+import { getFirestore, collection, getDocs, query, where, addDoc, deleteDoc, doc, updateDoc, Timestamp } from "firebase/firestore"; 
 import firebaseApp from "../../firebase"; 
-import { Ionicons } from '@expo/vector-icons'; // Importar Ionicons
+import { Ionicons } from '@expo/vector-icons';
 
 const db = getFirestore(firebaseApp);
 
-const ListVacasScreen = () => {
-  const [vacas, setVacas] = useState([]);
+const GerencerBalancasScreen = () => {
+  const [balancas, setBalancas] = useState([]);
   const [loading, setLoading] = useState(true);
   const [modalVisible, setModalVisible] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
-  const [selectedVaca, setSelectedVaca] = useState(null);
+  const [selectedBalanca, setSelectedBalanca] = useState(null);
   const [nome, setNome] = useState('');
-  const [dataUltimaCria, setDataUltimaCria] = useState('');
-  const [lote, setLote] = useState('');
+  const [peso, setPeso] = useState('');
+  const [dataCalibracao, setDataCalibracao] = useState('');
+  const [endereco_ip, setEnderecoIP ] = useState('');
 
   const auth = getAuth();
   const userId = auth.currentUser ? auth.currentUser.uid : null; 
 
-  const fetchVacas = async () => {
+  const fetchBalancas = async () => {
     if (!userId) return; 
     setLoading(true); 
     try {
-      const vacasCollection = collection(db, "Vacas");
-      const vacasQuery = query(vacasCollection, where("userId", "==", userId));
-      const vacasSnapshot = await getDocs(vacasQuery);
-      const vacasList = vacasSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-      setVacas(vacasList);
+      const balancasCollection = collection(db, "Balancas");
+      const balancasQuery = query(balancasCollection, where("userId", "==", userId));
+      const balancasSnapshot = await getDocs(balancasQuery);
+      const balancasList = balancasSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      setBalancas(balancasList);
     } catch (error) {
-      console.error("Erro ao buscar vacas: ", error);
+      console.error("Erro ao buscar balanças: ", error);
     } finally {
       setLoading(false); 
     }
   };
 
   useEffect(() => {
-    fetchVacas();
+    fetchBalancas();
   }, [userId]);
 
-  const handleAddVaca = async () => {
-    if (!nome || !dataUltimaCria || !lote) {
+  const handleAddBalanca = async () => {
+    if (!nome || !peso || !endereco_ip) {
       Alert.alert("Erro", "Todos os campos devem ser preenchidos.");
-      return; // Sai da função se algum campo estiver vazio
+      return;
     }
     try {
-      await addDoc(collection(db, "Vacas"), {
+      await addDoc(collection(db, "Balancas"), {
         nome,
-        data_ultima_cria: dataUltimaCria,
-        lote,
+        peso,
+        data_calibracao: Timestamp.now(),
+        endereco_ip,
         userId,
       });
       setNome('');
-      setDataUltimaCria('');
-      setLote('');
+      setPeso('');
+      setDataCalibracao('');
       setModalVisible(false);
-      fetchVacas();
-      Alert.alert("Sucesso", "Vaca registrada com sucesso!"); 
+      fetchBalancas();
+      Alert.alert("Sucesso", "Balança registrada com sucesso!"); 
     } catch (error) {
-      console.error("Erro ao cadastrar vaca: ", error);
+      console.error("Erro ao cadastrar balança: ", error);
     }
   };
 
-  const handleEditVaca = async () => {
-    if (!nome || !dataUltimaCria || !lote) {
+  const handleEditBalanca = async () => {
+    if (!nome || !peso || !endereco_ip) {
       Alert.alert("Erro", "Todos os campos devem ser preenchidos.");
-      return; // Sai da função se algum campo estiver vazio
+      return;
     }
-    if (selectedVaca) {
-      const vacaRef = doc(db, "Vacas", selectedVaca.id);
+    if (selectedBalanca) {
+      const balancaRef = doc(db, "Balancas", selectedBalanca.id);
       try {
-        await updateDoc(vacaRef, {
+        await updateDoc(balancaRef, {
           nome,
-          data_ultima_cria: dataUltimaCria,
-          lote,
+          peso,
+          data_calibracao: Timestamp.now(),
+          endereco_ip,
         });
-        setSelectedVaca(null);
+        setSelectedBalanca(null);
         setModalVisible(false);
-        fetchVacas(); 
-        Alert.alert("Sucesso", "Vaca editada com sucesso!"); 
+        fetchBalancas(); 
+        Alert.alert("Sucesso", "Balança editada com sucesso!"); 
       } catch (error) {
-        console.error("Erro ao editar vaca: ", error);
+        console.error("Erro ao editar balança: ", error);
       }
     }
   };
 
-  const handleDeleteVaca = (id) => {
+  const handleDeleteBalanca = (id) => {
     Alert.alert(
       "Confirmar Exclusão",
-      "Você realmente deseja excluir esta vaca?",
+      "Você realmente deseja excluir esta balança?",
       [
         { text: "Cancelar", style: "cancel" },
         { text: "Excluir", onPress: async () => {
           try {
-            await deleteDoc(doc(db, "Vacas", id));
-            fetchVacas(); 
-            Alert.alert("Sucesso", "Vaca deletada com sucesso!");
+            await deleteDoc(doc(db, "Balancas", id));
+            fetchBalancas(); 
+            Alert.alert("Sucesso", "Balança deletada com sucesso!");
           } catch (error) {
-            console.error("Erro ao excluir vaca: ", error);
+            console.error("Erro ao excluir balança: ", error);
           }
         }},
       ],
@@ -106,17 +109,17 @@ const ListVacasScreen = () => {
     );
   };
 
-  const openModal = (vaca = null) => {
-    setSelectedVaca(vaca);
-    if (vaca) {
-      setNome(vaca.nome);
-      setDataUltimaCria(vaca.data_ultima_cria);
-      setLote(vaca.lote);
+  const openModal = (balanca = null) => {
+    setSelectedBalanca(balanca);
+    if (balanca) {
+      setNome(balanca.nome);
+      setPeso(balanca.peso);
+      setEnderecoIP(balanca.endereco_ip)
       setIsEditing(true);
     } else {
       setNome('');
-      setDataUltimaCria('');
-      setLote('');
+      setPeso('');
+      setEnderecoIP('');
       setIsEditing(false);
     }
     setModalVisible(true);
@@ -130,22 +133,22 @@ const ListVacasScreen = () => {
     <View style={styles.container}>
       <TouchableOpacity style={styles.addButton} onPress={() => openModal()}>
         <Ionicons name="add" size={24} color="white" />
-        <Text style={styles.addButtonText}>Adicionar Vaca</Text>
+        <Text style={styles.addButtonText}>Adicionar Balança</Text>
       </TouchableOpacity>
       <FlatList
-        data={vacas}
+        data={balancas}
         keyExtractor={item => item.id}
         renderItem={({ item }) => (
           <View style={styles.itemContainer}>
             <Text style={styles.itemName}>{item.nome}</Text>
-            <Text style={styles.itemDetail}>Última Cria: {item.data_ultima_cria}</Text>
-            <Text style={styles.itemDetail}>Lote: {item.lote}</Text>
+            <Text style={styles.itemDetail}>Peso: {item.peso}</Text>
+            <Text style={styles.itemDetail}>Endereço IP: {item.endereco_ip}</Text>
             <View style={styles.buttonContainer}>
               <TouchableOpacity onPress={() => openModal(item)} style={styles.editButton}>
                 <Ionicons name="create" size={20} color="white" />
                 <Text style={styles.buttonText}>Editar</Text>
               </TouchableOpacity>
-              <TouchableOpacity onPress={() => handleDeleteVaca(item.id)} style={styles.deleteButton}>
+              <TouchableOpacity onPress={() => handleDeleteBalanca(item.id)} style={styles.deleteButton}>
                 <Ionicons name="trash" size={20} color="white" />
                 <Text style={styles.buttonText}>Excluir</Text>
               </TouchableOpacity>
@@ -161,8 +164,8 @@ const ListVacasScreen = () => {
         onRequestClose={() => setModalVisible(false)}
       >
         <View style={styles.modalContainer}>
-            <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>{isEditing ? "Editar Vaca" : "Adicionar Vaca"}</Text>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>{isEditing ? "Editar Balança" : "Adicionar Balança"}</Text>
             <TextInput
               placeholder="Nome"
               value={nome}
@@ -170,20 +173,21 @@ const ListVacasScreen = () => {
               style={styles.input}
             />
             <TextInput
-              placeholder="Data da Última Cria"
-              value={dataUltimaCria}
-              onChangeText={setDataUltimaCria}
+              placeholder="Peso"
+              value={peso}
+              onChangeText={setPeso}
               style={styles.input}
+              keyboardType="numeric"
             />
             <TextInput
-              placeholder="Lote"
-              value={lote}
-              onChangeText={setLote}
+              placeholder="Endereço IP"
+              value={endereco_ip}
+              onChangeText={setEnderecoIP}
               style={styles.input}
             />
             <TouchableOpacity
               style={styles.submitButton}
-              onPress={isEditing ? handleEditVaca : handleAddVaca}
+              onPress={isEditing ? handleEditBalanca : handleAddBalanca}
             >
               <Text style={styles.submitButtonText}>{isEditing ? "Atualizar" : "Adicionar"}</Text>
             </TouchableOpacity>
@@ -265,26 +269,16 @@ const styles = StyleSheet.create({
   },
   modalContent: {
     width: '90%',
-    backgroundColor: '#fff',
-    borderRadius: 12,
+    backgroundColor: '#ffffff',
+    borderRadius: 8,
     padding: 20,
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 8,
     elevation: 5,
   },
   modalTitle: {
-    fontSize: 22,
-    marginBottom: 15,
-    fontWeight: '600',
-    color: '#333',
-  },
-  modalSubTitle: {
-    fontSize: 16,
-    marginBottom: 20,
-    color: '#666',
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 10,
+    textAlign: 'center',
   },
   input: {
     width: '100%',
@@ -297,40 +291,35 @@ const styles = StyleSheet.create({
   },
   submitButton: {
     backgroundColor: '#4CAF50',
-    paddingVertical: 12,
-    paddingHorizontal: 20,
-    borderRadius: 8,
-    width: '100%',
+    padding: 15,
+    borderRadius: 5,
     alignItems: 'center',
     marginTop: 10,
   },
   submitButtonText: {
     color: '#fff',
-    fontWeight: '600',
-    fontSize: 16,
+    fontWeight: 'bold',
   },
   cancelButton: {
-    marginTop: 15,
+    marginTop: 10,
     alignItems: 'center',
   },
   cancelButtonText: {
-    color: '#333',
-    fontSize: 14,
-    textDecorationLine: 'underline',
+    color: '#f44336',
+    fontWeight: 'bold',
   },
   addButton: {
-    backgroundColor: '#007BFF',
+    backgroundColor: '#007bff',
     padding: 15,
     borderRadius: 5,
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 20,
+    marginBottom: 10,
   },
   addButtonText: {
     color: '#fff',
-    fontWeight: 'bold',
     marginLeft: 5,
   },
 });
 
-export default ListVacasScreen;
+export default GerencerBalancasScreen;

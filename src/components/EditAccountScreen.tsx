@@ -12,9 +12,6 @@ const EditAccountScreen = ({ route }) => {
       Alert.alert("Erro", "Por favor, preencha todos os campos.");
       return;
     }
-
-    // Chame a função para atualizar os dados
-    handleUpdate({ email, password });
   };
 
   return (

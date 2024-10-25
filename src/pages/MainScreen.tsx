@@ -4,9 +4,10 @@ import { createStackNavigator } from '@react-navigation/stack';
 import { useAuth } from '../hooks/useAuth';
 import AuthScreen from '../components/AuthScreen';
 import AuthenticatedScreen from '../components/AuthenticatedScreen';
-import GerencerVacasScreen from '../components/vacas/GerecerVacasScreen';
+import GerencerVacasScreen from '../components/vacas/GerencerVacasScreen';
 import PesagemLeiteScreen from '../components/vacas/PesagemLeiteScreen';
 import EditAccountScreen from '../components/EditAccountScreen';
+import GerencerBalancasScreen from '../components/balancas/GerencerBalancaScreen';
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from '@firebase/auth';
 import app from '../firebase';
 
@@ -72,6 +73,7 @@ const MainScreen = () => {
       )}
       <Stack.Screen name="Gerenciar vacas" component={GerencerVacasScreen} />
       <Stack.Screen name="Pesagem do leite" component={PesagemLeiteScreen} />
+      <Stack.Screen name="Gerenciar balanças" component={GerencerBalancasScreen} />
       <Stack.Screen name="Editar dados da conta" component={EditAccountScreen} />
     </Stack.Navigator>
   );
