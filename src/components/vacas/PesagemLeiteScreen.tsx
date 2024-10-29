@@ -180,7 +180,7 @@ const PesagemLeiteScreen = () => {
             <Text style={styles.modalTitle}>Pesagens da Vaca</Text>
             {/* <Text style={styles.modalSubTitle}>Vaca: {selectedVaca?.nome}</Text> */}
             <FlatList
-              data={pesagens}
+              data={pesagens.sort((a, b) => b.data - a.data)} // Ordena em ordem decrescente (mais recente primeiro)
               keyExtractor={item => item.id}
               renderItem={({ item }) => (
                 <View style={styles.pesagemItemContainer}>
