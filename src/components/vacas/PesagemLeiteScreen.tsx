@@ -9,6 +9,7 @@ const db = getFirestore(firebaseApp);
 
 const PesagemLeiteScreen = () => {
   const [vacas, setVacas] = useState([]);
+  const [filteredVacas, setFilteredVacas] = useState([]);
   const [pesagens, setPesagens] = useState([]);
   const [loading, setLoading] = useState(true);
   const [modalVisible, setModalVisible] = useState(false);
@@ -16,6 +17,7 @@ const PesagemLeiteScreen = () => {
   const [selectedVaca, setSelectedVaca] = useState(null);
   const [pesoLeite, setPesoLeite] = useState('');
   const [editingPesagem, setEditingPesagem] = useState(null); // Estado para armazenar a pesagem em edição
+  const [searchQuery, setSearchQuery] = useState(''); // Novo estado para a pesquisa
 
   const auth = getAuth();
   const userId = auth.currentUser ? auth.currentUser.uid : null;
@@ -39,6 +41,18 @@ const PesagemLeiteScreen = () => {
   useEffect(() => {
     fetchVacas();
   }, [userId]);
+
+  useEffect(() => {
+    // Filtra a lista conforme a consulta de pesquisa muda
+    if (searchQuery) {
+      const filtered = vacas.filter(vaca =>
+        vaca.nome.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+      setFilteredVacas(filtered);
+    } else {
+      setFilteredVacas(vacas); // Mostra todos os registros se o campo de pesquisa estiver vazio
+    }
+  }, [searchQuery, vacas]);
 
   const handleAddPesagem = async () => {
     if (!selectedVaca || !pesoLeite) {
@@ -119,8 +133,22 @@ const PesagemLeiteScreen = () => {
 
   return (
     <View style={styles.container}>
+      <View style={styles.searchContainer}>
+        <Ionicons name="search" size={20} color="#000" style={styles.searchIcon} />
+        <TextInput
+          placeholder="Pesquisar por nome"
+          value={searchQuery}
+          onChangeText={setSearchQuery}
+          style={styles.searchInput}
+        />
+        {searchQuery ? (
+          <TouchableOpacity onPress={() => setSearchQuery('')}>
+            <Ionicons name="close-circle" size={20} color="#000" style={styles.clearIcon} />
+          </TouchableOpacity>
+        ) : null}
+      </View>
       <FlatList
-        data={vacas}
+        data={filteredVacas}
         keyExtractor={item => item.id}
         renderItem={({ item }) => (
           <View style={styles.itemContainer}>
@@ -214,6 +242,28 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 16,
     backgroundColor: '#f0f0f0',
+  },
+  searchContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#fff',
+    borderRadius: 8,
+    borderColor: '#ddd',
+    borderWidth: 1,
+    paddingHorizontal: 10,
+    marginBottom: 15,
+  },
+  searchIcon: {
+    marginRight: 8,
+  },
+  searchInput: {
+    flex: 1,
+    paddingVertical: 10,
+    paddingHorizontal: 8,
+    fontSize: 16,
+  },
+  clearIcon: {
+    marginLeft: 8,
   },
   loadingIndicator: {
     flex: 1,

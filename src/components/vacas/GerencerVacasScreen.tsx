@@ -3,12 +3,13 @@ import { View, Text, FlatList, ActivityIndicator, StyleSheet, Modal, TextInput, 
 import { getAuth } from "firebase/auth"; 
 import { getFirestore, collection, getDocs, query, where, addDoc, deleteDoc, doc, updateDoc } from "firebase/firestore"; 
 import firebaseApp from "../../firebase"; 
-import { Ionicons } from '@expo/vector-icons'; // Importar Ionicons
+import { Ionicons } from '@expo/vector-icons';
 
 const db = getFirestore(firebaseApp);
 
 const ListVacasScreen = () => {
   const [vacas, setVacas] = useState([]);
+  const [filteredVacas, setFilteredVacas] = useState([]);
   const [loading, setLoading] = useState(true);
   const [modalVisible, setModalVisible] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
@@ -16,6 +17,7 @@ const ListVacasScreen = () => {
   const [nome, setNome] = useState('');
   const [dataUltimaCria, setDataUltimaCria] = useState('');
   const [lote, setLote] = useState('');
+  const [searchQuery, setSearchQuery] = useState(''); // Novo estado para a pesquisa
 
   const auth = getAuth();
   const userId = auth.currentUser ? auth.currentUser.uid : null; 
@@ -29,6 +31,7 @@ const ListVacasScreen = () => {
       const vacasSnapshot = await getDocs(vacasQuery);
       const vacasList = vacasSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
       setVacas(vacasList);
+      setFilteredVacas(vacasList); // Inicializa o filtro com todos os registros
     } catch (error) {
       console.error("Erro ao buscar vacas: ", error);
     } finally {
@@ -40,10 +43,23 @@ const ListVacasScreen = () => {
     fetchVacas();
   }, [userId]);
 
+  useEffect(() => {
+    // Filtra a lista conforme a consulta de pesquisa muda
+    if (searchQuery) {
+      const filtered = vacas.filter(vaca =>
+        vaca.nome.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        vaca.lote.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+      setFilteredVacas(filtered);
+    } else {
+      setFilteredVacas(vacas); // Mostra todos os registros se o campo de pesquisa estiver vazio
+    }
+  }, [searchQuery, vacas]);
+
   const handleAddVaca = async () => {
     if (!nome || !dataUltimaCria || !lote) {
       Alert.alert("Erro", "Todos os campos devem ser preenchidos.");
-      return; // Sai da função se algum campo estiver vazio
+      return;
     }
     try {
       await addDoc(collection(db, "Vacas"), {
@@ -66,7 +82,7 @@ const ListVacasScreen = () => {
   const handleEditVaca = async () => {
     if (!nome || !dataUltimaCria || !lote) {
       Alert.alert("Erro", "Todos os campos devem ser preenchidos.");
-      return; // Sai da função se algum campo estiver vazio
+      return;
     }
     if (selectedVaca) {
       const vacaRef = doc(db, "Vacas", selectedVaca.id);
@@ -132,8 +148,22 @@ const ListVacasScreen = () => {
         <Ionicons name="add" size={24} color="white" />
         <Text style={styles.addButtonText}>Adicionar Vaca</Text>
       </TouchableOpacity>
+      <View style={styles.searchContainer}>
+        <Ionicons name="search" size={20} color="#000" style={styles.searchIcon} />
+        <TextInput
+          placeholder="Pesquisar por nome ou lote"
+          value={searchQuery}
+          onChangeText={setSearchQuery}
+          style={styles.searchInput}
+        />
+        {searchQuery ? (
+          <TouchableOpacity onPress={() => setSearchQuery('')}>
+            <Ionicons name="close-circle" size={20} color="#000" style={styles.clearIcon} />
+          </TouchableOpacity>
+        ) : null}
+      </View>
       <FlatList
-        data={vacas}
+        data={filteredVacas}
         keyExtractor={item => item.id}
         renderItem={({ item }) => (
           <View style={styles.itemContainer}>
@@ -202,6 +232,28 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 16,
     backgroundColor: '#f0f0f0',
+  },
+  searchContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#fff',
+    borderRadius: 8,
+    borderColor: '#ddd',
+    borderWidth: 1,
+    paddingHorizontal: 10,
+    marginBottom: 15,
+  },
+  searchIcon: {
+    marginRight: 8,
+  },
+  searchInput: {
+    flex: 1,
+    paddingVertical: 10,
+    paddingHorizontal: 8,
+    fontSize: 16,
+  },
+  clearIcon: {
+    marginLeft: 8,
   },
   loadingIndicator: {
     flex: 1,
@@ -323,7 +375,7 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 20,
+    marginBottom: 10,
   },
   addButtonText: {
     color: '#fff',
